@@ -316,7 +316,7 @@ function rankText(p: Profile, s: Signals) {
   return `班排 ${p.classRank}/${p.classSize}（約前 ${s.rankPct.toFixed(0)}%）`;
 }
 
-function englishText(p: Profile, s?: Signals) {
+function englishText(p: Profile) {
   const en = scoredEnglish(p);
   if (p.englishType === "none") return "未提供英文成績";
   if (en.invalid) return `${en.label} ${p.englishScore}（分數無效）`;
@@ -460,7 +460,7 @@ function buildStrengths(p: Profile, s: Signals, prof: ProfessorDef): CitedNote[]
   if (s.flags.englishStrong)
     out.push(
       note(
-        `${englishText(p, s)} 過多數實驗室的英文舒適線。`,
+        `${englishText(p)} 過多數實驗室的英文舒適線。`,
         "英文",
         "stated",
         p.englishScore,
@@ -497,7 +497,7 @@ function buildWeaknesses(p: Profile, s: Signals, prof: ProfessorDef): CitedNote[
   if (s.flags.englishInvalid)
     out.push(
       note(
-        `${englishText(p, s)}，分數無效，不能計入英文優勢。`,
+        `${englishText(p)}，分數無效，不能計入英文優勢。`,
         "英文",
         "stated",
         p.englishScore,
@@ -559,7 +559,7 @@ function buildWeaknesses(p: Profile, s: Signals, prof: ProfessorDef): CitedNote[
   )
     out.push(
       note(
-        `${englishText(p, s)}，英文會成為吳委員與部分課程的硬風險。`,
+        `${englishText(p)}，英文會成為吳委員與部分課程的硬風險。`,
         "英文",
         s.flags.englishMissing ? "missing" : "stated",
         p.englishScore || "未填",
@@ -663,7 +663,7 @@ function buildRisk(p: Profile, s: Signals, prof: ProfessorDef, weaknesses: Cited
   if (s.flags.emptyCore)
     return "主材料（專題／研究）近乎空白，口試沒有可以防守的故事。";
   if (s.flags.englishInvalid && prof.id === "d")
-    return `${englishText(p, s)}，分數無效，不能當成英文過線。`;
+    return `${englishText(p)}，分數無效，不能當成英文過線。`;
   if (prof.weakestLink) {
     if ((s.flags.englishMissing || s.flags.englishInvalid) && s.flags.recWeak)
       return "英文與推薦信同時缺位，嚴格委員可直接用『程序不完整』擋下。";
@@ -679,7 +679,7 @@ function buildRisk(p: Profile, s: Signals, prof: ProfessorDef, weaknesses: Cited
     return "學業審查這關過不了，後面的亮點可能根本不會被展開。";
   if ((s.flags.englishMissing || s.flags.englishInvalid) && prof.id === "d")
     return s.flags.englishInvalid
-      ? `${englishText(p, s)}。無效分數我會當沒交。`
+      ? `${englishText(p)}。無效分數我會當沒交。`
       : "英文是吳委員的硬門檻，沒有成績就等於請委員會假設你過不了 seminar。";
   if (!s.flags.hasPaper && prof.id === "b" && s.research < 55)
     return "研究潛力只能靠口頭承諾，陳委員這類人最怕收進來後兩年交不出題目。";
@@ -698,7 +698,7 @@ function buildRisk(p: Profile, s: Signals, prof: ProfessorDef, weaknesses: Cited
   if (prof.id === "d")
     return s.flags.englishStrong
       ? "成績過線，但國際化仍只是考試分數，不是使用證據。"
-      : `${englishText(p, s)} 會成為我這票的主要保留理由。`;
+      : `${englishText(p)} 會成為我這票的主要保留理由。`;
   return weaknesses[0]?.text ?? "沒有單一致命傷，但優勢不夠尖，合議會往中間靠。";
 }
 
@@ -761,7 +761,7 @@ function buildComment(p: Profile, s: Signals, prof: ProfessorDef, score: number,
     return `工程上我只信可驗證的東西：專題細節、repo、實習交付。${s.flags.projectSubstance ? "專題有寫到作法，這點過關。" : "專題敘事偏空。"} ${s.flags.github ? "有作品入口。" : "沒有可點的作品。"} ${s.flags.strongInternship ? "實習機構訊號強。" : s.flags.anyInternship ? "有實習，但還要看個人貢獻。" : "沒有外部交付。"} 推甄不是軟體工程招聘，但本所系統／產學案需要能做完的人。${stanceLine}`;
   }
   if (prof.id === "d") {
-    return `英文與國際化不是裝飾。本案是 ${englishText(p, s)}，我的判斷是「${s.bands.english}」（估算）。${s.flags.englishInvalid ? "分數無效，我不會把它當過線。" : s.flags.englishStrong ? "這條線過了，我不會用英文擋。" : "這會影響能不能讀論文、寫 related work、去 seminar 開口。"} ${s.flags.journal || s.flags.conference ? "若已有英文投稿，請口試帶去。" : "目前看不出英文學術產出。"} ${stanceLine}`;
+    return `英文與國際化不是裝飾。本案是 ${englishText(p)}，我的判斷是「${s.bands.english}」（估算）。${s.flags.englishInvalid ? "分數無效，我不會把它當過線。" : s.flags.englishStrong ? "這條線過了，我不會用英文擋。" : "這會影響能不能讀論文、寫 related work、去 seminar 開口。"} ${s.flags.journal || s.flags.conference ? "若已有英文投稿，請口試帶去。" : "目前看不出英文學術產出。"} ${stanceLine}`;
   }
   return `我不管故事好不好聽，我找洞。最弱的維度是「${{ academics: "學業", research: "研究", engineering: "實作", english: "英文", letters: "推薦", completeness: "完整度" }[weakest(s)]}」。${s.flags.recWeak ? "推薦信情況偏弱，推甄這點不能裝沒看到。" : ""} ${s.flags.emptyCore ? "主材料空白。" : "有材料，但經不起追問的地方要自己先講。"} 分數 ${Math.round(score)} 只是內部審查強度，不是錄取率。${stanceLine}`;
 }
@@ -864,7 +864,7 @@ function speakerLine(rev: ProfessorReview, p: Profile, s: Signals): string {
             ? "工程有入口可查，口試會拆模組。"
             : "實作幾乎無法驗證。"
           : prof.id === "d"
-            ? `${englishText(p, s)}。這是我的硬線。`
+            ? `${englishText(p)}。這是我的硬線。`
             : "";
   return `${open}${focus} 主風險：${rev.maxRisk}`;
 }
@@ -986,9 +986,11 @@ export function runSimulation(
     interviewBonus?: number;
     interviewByProfessor?: Record<string, number>;
     prefs?: ReviewPrefs;
+    /** Inject a clock for reproducible reviews; it never affects scores. */
+    now?: () => Date;
   },
 ): SimulationResult {
-  const ids = professorIds.filter((id) => PROFESSORS.some((p) => p.id === id));
+  const ids = [...new Set(professorIds)].filter((id) => PROFESSORS.some((p) => p.id === id));
   const chosen = (ids.length ? ids : PROFESSORS.map((p) => p.id)).map(professorById);
   const prefs = opts?.prefs ?? DEFAULT_PREFS;
   const signals = extractSignals(profile, prefs);
@@ -1013,7 +1015,7 @@ export function runSimulation(
   };
   return {
     caseId: caseId(profile),
-    createdAt: new Date().toISOString(),
+    createdAt: (opts?.now?.() ?? new Date()).toISOString(),
     signals,
     reviews,
     committee,

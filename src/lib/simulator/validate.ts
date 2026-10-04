@@ -48,6 +48,7 @@ export function resolveEnglishVersion(p: Profile): EnglishVersion {
 }
 
 export function parseNum(v: string): number | null {
+  if (!String(v).trim()) return null;
   const n = Number(String(v).trim().replace(/,/g, ""));
   return Number.isFinite(n) ? n : null;
 }

@@ -1,5 +1,7 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
+import { createSafeStorage } from "@/lib/safe-storage";
+import { restoreCase } from "./case-persistence";
 import {
   DEFAULT_PREFS,
   EMPTY_PROFILE,
@@ -43,6 +45,7 @@ interface CaseState {
 }
 
 const defaultSelected = PROFESSORS.map((p) => p.id);
+let reviewGeneration = 0;
 
 function keepPrior(get: () => CaseState): SimulationResult | null {
   return get().result ?? get().priorResult;
@@ -50,7 +53,12 @@ function keepPrior(get: () => CaseState): SimulationResult | null {
 
 export const useCaseStore = create<CaseState>()(
   persist(
-    (set, get) => ({
+    (setState, get) => {
+      const set = (patch: Partial<CaseState>) => {
+        reviewGeneration += 1;
+        setState({ reviewing: false, ...patch });
+      };
+      return ({
       profile: EMPTY_PROFILE,
       selectedIds: defaultSelected,
       step: "profile",
@@ -155,7 +163,9 @@ export const useCaseStore = create<CaseState>()(
           interviewByProfessor: {},
           priorResult: keepPrior(get),
         });
-        window.setTimeout(() => {
+        const generation = reviewGeneration;
+        globalThis.setTimeout(() => {
+          if (generation !== reviewGeneration) return;
           set({ result, reviewing: false });
         }, 1100);
         return { ok: true, reason: "" };
@@ -183,20 +193,15 @@ export const useCaseStore = create<CaseState>()(
           step: "session",
         });
       },
-    }),
+    }); },
     {
-      name: "grad-board-case-v2",
+      name: "grad-board-session-v3",
+      version: 1,
+      storage: createJSONStorage(() => createSafeStorage(() => window.sessionStorage)),
       skipHydration: true,
-      partialize: (s) => ({
-        profile: s.profile,
-        selectedIds: s.selectedIds,
-        step: s.step,
-        result: s.result,
-        priorResult: s.priorResult,
-        interviewBonus: s.interviewBonus,
-        interviewByProfessor: s.interviewByProfessor,
-        prefs: s.prefs,
-      }),
+      partialize: (s) => ({ profile: s.profile, selectedIds: s.selectedIds, prefs: s.prefs }),
+      migrate: (persisted) => restoreCase(persisted),
+      merge: (persisted, current) => ({ ...current, ...restoreCase(persisted) }),
     },
   ),
 );

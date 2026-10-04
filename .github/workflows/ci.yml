@@ -1,0 +1,34 @@
+name: Audit quality gates
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  quality:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --audit-level=high
+      - run: npm audit --omit=dev --audit-level=high
+      - run: npx playwright install --with-deps chromium
+        if: runner.os == 'Linux'
+      - run: npm run test:e2e
+        if: runner.os == 'Linux'
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: failure-${{ matrix.os }}
+          path: test-results/
