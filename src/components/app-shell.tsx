@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { StorageNotice } from "@/components/storage-notice";
 import { ChevronDown, FileText, RotateCcw, Scale, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SAMPLES, type Step } from "@/lib/simulator";
@@ -32,6 +33,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-bg text-fg">
+      <StorageNotice />
       <header className="sticky top-0 z-20 border-b border-border bg-bg/92 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
@@ -92,8 +94,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
         <div className="border-t border-border bg-surface-2/60">
           <p className="mx-auto max-w-6xl px-4 py-2 text-xs text-muted sm:px-6">
-            這是模擬審查，不是真實錄取率預測。訊號與裁決皆為估算，不能代表任何學校的官方結果。
+            這是未經院校校準的規則模擬；委員、分級與裁決均為虛構情境，不能用於真實升學決策。
           </p>
+        </div>
+        <div className="mx-auto max-w-6xl px-4 py-2 text-xs text-muted sm:px-6" role="note">
+          請只使用虛構或去識別化材料，勿輸入真實姓名、聯絡方式或申請文件。
+          草稿僅暫存於目前頁籤（未加密）；請在共用裝置離開前清除。
+          <Button type="button" variant="ghost" size="sm" onClick={() => { reset(); void useCaseStore.persist.clearStorage(); }}>清除本案資料</Button>
         </div>
       </header>
 

@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import { useMemo } from "react";
+import { cloneElement, isValidElement, useId, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,10 +41,11 @@ function Field({
   error?: string;
   children: React.ReactNode;
 }) {
+  const labelId = useId();
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label>{label}</Label>
-      {children}
+    <div role="group" aria-labelledby={labelId} className="flex flex-col gap-1.5">
+      <Label id={labelId}>{label}</Label>
+      {isValidElement<{ "aria-labelledby"?: string }>(children) ? cloneElement(children, { "aria-labelledby": labelId }) : children}
       {error ? (
         <p className="text-xs break-words text-reject" role="alert">
           {error}
@@ -197,7 +198,7 @@ export function ProfileForm() {
             <Field label="姓名（可匿名）">
               <Input
                 value={profile.name}
-                placeholder="例如 林子安"
+                placeholder="請填虛構暱稱"
                 onChange={(e) => patch({ name: e.target.value })}
               />
             </Field>

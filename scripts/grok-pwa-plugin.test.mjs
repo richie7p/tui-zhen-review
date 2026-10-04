@@ -6,9 +6,9 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 import {
   appNameFromHost,
-  createHeadInjector,
+  createHeadInjector as originalCreateHeadInjector,
   grokXCreatorHeadTags,
-  injectGrokPwaHead,
+  injectGrokPwaHead as originalInjectGrokPwaHead,
   isDocumentPath,
   isInstallQuery,
   publicAppHost,
@@ -20,6 +20,11 @@ import {
 import { renderInstallPage } from "./grok-pwa-plugin.mjs";
 
 const TEMPLATE_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
+// Pure injector fixtures must not inherit the application's real share card/title.
+const emptyCwd = mkdtempSync(join(tmpdir(), "pwa-empty-"));
+const injectGrokPwaHead = (html, options = {}) => originalInjectGrokPwaHead(html, { cwd: emptyCwd, ...options });
+const createHeadInjector = (options = {}) => originalCreateHeadInjector({ cwd: emptyCwd, ...options });
+
 
 test("injects before </head>", () => {
   const out = injectGrokPwaHead("<html><head><title>x</title></head><body></body></html>");

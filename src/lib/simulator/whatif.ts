@@ -64,10 +64,12 @@ export function availableMoves(p: Profile, prefs?: ReviewPrefs): WhatIfMove[] {
     });
   }
   if (s.rankPct == null || s.rankPct > 10) {
+    const size = Number(p.classSize);
+    const smallClass = Number.isSafeInteger(size) && size > 0 && size < 10;
     moves.push({
       id: "rankTop10",
-      label: "班排進前 10%",
-      hint: "學業位置試算，不是改成績單",
+      label: smallClass ? "班排進第 1 名" : "班排進前 10%",
+      hint: smallClass ? "班級不足 10 人，第一名仍高於 10%；保留原班級人數" : "學業位置試算；未提供有效班級人數時假設 50 人",
     });
   }
   if (!s.flags.lab) {
@@ -112,9 +114,9 @@ export function applyWhatIf(
   }
   if (set.has("rankTop10")) {
     const size = Number(next.classSize);
-    const n = Number.isFinite(size) && size > 0 ? size : 50;
+    const n = Number.isSafeInteger(size) && size > 0 ? size : 50;
     next.classSize = String(n);
-    next.classRank = String(Math.max(1, Math.ceil(n * 0.1)));
+    next.classRank = String(Math.max(1, Math.floor(n * 0.1)));
   }
   if (set.has("labRA")) {
     const extra =

@@ -15,6 +15,8 @@ function Home() {
   const reviewing = useCaseStore((s) => s.reviewing);
 
   useEffect(() => {
+    // Retire the previous durable, unencrypted case store without importing PII.
+    try { window.localStorage.removeItem("grad-board-case-v2"); } catch { /* Storage may be blocked. */ }
     void useCaseStore.persist.rehydrate();
   }, []);
 
