@@ -41,7 +41,7 @@ PDF 稽核逐項修正、測試方式與仍需外部查核的限制見 [AUDIT-FO
 | 層 | 選擇 |
 | --- | --- |
 | UI | React 19、TanStack Start、Tailwind CSS v4 |
-| 狀態 | zustand + localStorage |
+| 狀態 | zustand + sessionStorage |
 | 審查 | 規則引擎（決定性，不呼叫 LLM） |
 
 ## 本機開發
@@ -62,4 +62,4 @@ npm run build
 
 ## 授權與聲明
 
-私人倉庫。模擬結果僅供練習與自我檢視，不是任何研究所的錄取承諾或官方標準。
+模擬結果僅供練習與自我檢視，不是任何研究所的錄取承諾或官方標準。

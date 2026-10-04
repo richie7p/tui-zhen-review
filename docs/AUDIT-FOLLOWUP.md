@@ -16,3 +16,7 @@ Baseline: portfolio audit dated 2026-10-03, pp. 29–30, commit `ccd816d250dc0a7
 Node 22: `npm ci`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, `npm audit --audit-level=high`, `npm audit --omit=dev --audit-level=high`. Install Chromium via `npx playwright install chromium`, then `npm run test:e2e` serves the production output at port 6345. No API key is needed.
 
 Scaffold: 197 CLI/tooling + 55 shared app/auth tests. Domain: 19 tests including four storage tests and two pending-review races. Browser: 6 tests (3 scenarios × desktop/mobile). These counts stay separate; scaffold tests do not validate admissions rules. CI runs Windows/Ubuntu quality gates and Ubuntu browser tests. Latest commit status is visible in PR checks. Authoring script tests use attributed checked-in fixtures instead of ignored developer-machine documentation.
+
+## Content and function acceptance update
+
+See [the 2026-10-04 acceptance record](CONTENT-FUNCTION-ACCEPTANCE.md) for the additional content review, fixes, regression cases and limits. Earlier counts above describe the audit baseline.
